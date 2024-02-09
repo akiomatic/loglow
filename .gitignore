@@ -132,3 +132,7 @@ dist
 # IDE
 .idea/
 .vscode/
+
+# Test files
+*/**/**.test.js
+*/**/**.test.ts
