@@ -1,0 +1,37 @@
+{
+  "name": "loglow",
+  "version": "0.0.1",
+  "description": "This package is designed to improve the debugging experience by adding customizable colors, labels, and source information (file name and line number) to console log statements, making it easier to distinguish and understand logs in the development process.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akiomatic/loglow.git"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "keywords": [
+    "logging",
+    "debugging",
+    "console-log",
+    "enhanced-logging",
+    "development-tools",
+    "nodejs-logging",
+    "colorful-console",
+    "debug-tools",
+    "javascript-logging",
+    "log-enhancement"
+  ],
+  "author": "akiomatic",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  }
+}
