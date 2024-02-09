@@ -15,7 +15,18 @@
   "scripts": {
     "build": "tsup"
   },
-  "keywords": [],
+  "keywords": [
+    "logging",
+    "debugging",
+    "console-log",
+    "enhanced-logging",
+    "development-tools",
+    "nodejs-logging",
+    "colorful-console",
+    "debug-tools",
+    "javascript-logging",
+    "log-enhancement"
+  ],
   "author": "akiomatic",
   "license": "ISC",
   "devDependencies": {
