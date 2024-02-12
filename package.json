@@ -35,6 +35,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "chalk": "^4.1.2"
+    "@types/source-map-support": "^0.5.10",
+    "chalk": "^4.1.2",
+    "source-map-support": "^0.5.21"
   }
 }
