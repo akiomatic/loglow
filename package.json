@@ -1,7 +1,6 @@
 {
   "name": "loglow",
-  "version": "0.0.1",
-  "description": "This package is designed to improve the debugging experience by adding customizable colors, labels, and source information (file name and line number) to console log statements, making it easier to distinguish and understand logs in the development process.",
+  "version": "0.0.2",
   "description": "This package is designed to improve the debugging experience by adding customizable colors, labels, and source information to console log statements, making it easier to distinguish and understand logs in the development process.",
   "repository": {
     "type": "git",
