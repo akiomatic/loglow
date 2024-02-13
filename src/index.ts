@@ -1,139 +1,107 @@
-import chalk, { ForegroundColor } from "chalk";
-import * as fs from "fs";
-import sourceMapSupport from "source-map-support";
-
-sourceMapSupport.install();
-
-interface IConfig {
-  format: string;
-  colors: {
-    source: string;
-    info: string;
-    error: string;
-    warn: string;
-    debug: string;
-  };
+export enum LogColor {
+  Red = "\x1b[31m",
+  Green = "\x1b[32m",
+  Yellow = "\x1b[33m",
+  Blue = "\x1b[34m",
+  Magenta = "\x1b[35m",
+  Cyan = "\x1b[36m",
+  White = "\x1b[37m",
 }
 
-const enum LogLevel {
-  INFO = "info",
-  WARN = "warn",
-  ERROR = "error",
-  DEBUG = "debug",
+export enum LogStyle {
+  Reset = "\x1b[0m",
+  Bold = "\x1b[1m",
+  Dim = "\x1b[2m",
+  Italic = "\x1b[3m",
+  Underscore = "\x1b[4m",
+  Blink = "\x1b[5m",
+  Reverse = "\x1b[7m",
 }
 
-class Loglow {
-  private static config: IConfig = {
-    format: "{timestamp} {source} [{level}] {messages}",
-    colors: {
-      source: "gray",
-      info: "reset",
-      error: "red",
-      warn: "yellow",
-      debug: "cyan",
-    },
-  };
+enum DataType {
+  Newline = "newline",
+  Timestamp = "timestamp",
+  Message = "message",
+}
 
-  static {
-    try {
-      const data = fs.readFileSync("lgconfig.json", "utf-8");
-      const config = JSON.parse(data);
+type LogEntry = {
+  type: DataType;
+  data?: string | unknown[];
+  color?: LogColor | LogStyle;
+};
 
-      Loglow.config = { ...Loglow.config, ...config };
-    } catch {}
-  }
+export class Loglow {
+  private data: LogEntry[] = [];
 
-  private static _isValidColor(color: string): color is typeof ForegroundColor {
-    return chalk[color as typeof ForegroundColor] !== undefined;
-  }
-  private static _log(logLevel: LogLevel, messages: string[]): void {
-    const { fileName } = Loglow._getSource();
-    let formattedMessage: string = Loglow.config.format;
-    const sourceColor: string = Loglow.config.colors.source;
-    const logLevelColor: string = Loglow.config.colors?.[logLevel] ?? "reset";
-
-    if (formattedMessage.includes("{source}")) {
-      const colorFunction = this._isValidColor(sourceColor)
-        ? chalk[sourceColor]
-        : chalk.reset;
-      formattedMessage = formattedMessage.replace(
-        "{source}",
-        colorFunction(fileName),
-      );
-    }
-
-    if (
-      formattedMessage.includes("{level}") ||
-      formattedMessage.includes("{messages}")
-    ) {
-      const colorFunction = this._isValidColor(logLevelColor)
-        ? chalk[logLevelColor]
-        : chalk.reset;
-      formattedMessage = formattedMessage
-        .replace("{level}", colorFunction(logLevel.toUpperCase()))
-        .replace("{messages}", colorFunction(messages.join(" ")));
-    }
-
-    formattedMessage = formattedMessage.replace(
-      "{timestamp}",
-      new Date().toISOString(),
-    );
-
-    switch (logLevel) {
-      case LogLevel.WARN:
-        console.warn(formattedMessage);
-        break;
-      case LogLevel.ERROR:
-        console.error(formattedMessage);
-        break;
-      default:
-        console.log(formattedMessage);
-    }
-  }
-
-  private static _getSource(): { fileName: string } {
-    const err: Error = new Error();
-    const stack: string | undefined = err.stack;
-    const stackLines: string[] = stack ? stack.split("\n") : [];
-
-    const internalCallsToSkip = ["Loglow._log", "Loglow._getSource", "Error"];
-
-    let relevantLine = stackLines.find((line) => {
-      return !internalCallsToSkip.some((internalCall) =>
-        line.includes(internalCall),
-      );
+  public add(...messages: unknown[]): this {
+    this.data.push({
+      type: DataType.Message,
+      data: messages,
     });
-
-    if (!relevantLine) {
-      return { fileName: "unknown" };
-    }
-
-    const match =
-      /at\s+(?:.*\s+)?(?:\((?:.*\/)?(.*?):\d+:\d+\)|((?:.*\/)?.*?):\d+:\d+)/.exec(
-        relevantLine,
-      );
-    const fileName = match ? match[1] || match[2] : "unknown";
-
-    return {
-      fileName: fileName.split("/").pop() || "unknown",
-    };
+    return this;
   }
 
-  static info(...messages: string[]): void {
-    Loglow._log(LogLevel.INFO, messages);
+  public addTimestamp(color: LogColor | LogStyle = LogStyle.Reset): this {
+    this.data.push({
+      type: DataType.Timestamp,
+      color: color,
+      data: new Date().toISOString(),
+    });
+    return this;
   }
 
-  static warn(...messages: string[]): void {
-    Loglow._log(LogLevel.WARN, messages);
+  public addNewline(): this {
+    this.data.push({ type: DataType.Newline });
+    return this;
   }
 
-  static error(...messages: string[]): void {
-    Loglow._log(LogLevel.ERROR, messages);
+  private isLogColorOrStyle(value: string): boolean {
+    return Object.values({ ...LogColor, ...LogStyle }).includes(
+      value as LogColor | LogStyle,
+    );
   }
 
-  static debug(...messages: string[]): void {
-    Loglow._log(LogLevel.DEBUG, messages);
+  public print(): void {
+    let output = "";
+    this.data.forEach((item) => {
+      switch (item.type) {
+        case DataType.Newline:
+          output += "\n";
+          break;
+        case DataType.Timestamp:
+          output += `${item.color}${item.data}${LogStyle.Reset}`;
+          break;
+        case DataType.Message:
+          let accMessage = "";
+          let count = 0;
+
+          if (typeof item.data === "string") {
+            output += `${item.data}`;
+            break;
+          }
+
+          item.data!.forEach((data) => {
+            if (typeof data === "string" && this.isLogColorOrStyle(data)) {
+              accMessage += `${data}`;
+            } else {
+              console.log("data", data);
+              if (count > 0) {
+                accMessage += " ";
+              }
+              accMessage += `${data}`;
+              count++;
+            }
+          });
+
+          output += `${accMessage}${LogStyle.Reset}`;
+
+          if (item.data!.length > 0) {
+            output += " ";
+          }
+
+          break;
+      }
+    });
+    console.log(output);
   }
 }
-
-export default Loglow;
