@@ -1,6 +1,6 @@
 {
   "name": "loglow",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A flexible logging utility for Node.js, offering customizable color, style, and timestamp options for enhanced console output.",
   "repository": {
     "type": "git",
