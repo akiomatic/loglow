@@ -1,3 +1,6 @@
+/**
+ * Enumeration for log colors with ANSI escape codes for terminal coloring.
+ */
 export enum LogColor {
   Red = "\x1b[31m",
   Green = "\x1b[32m",
@@ -8,6 +11,9 @@ export enum LogColor {
   White = "\x1b[37m",
 }
 
+/**
+ * Enumeration for log styles with ANSI escape codes to style terminal output.
+ */
 export enum LogStyle {
   Reset = "\x1b[0m",
   Bold = "\x1b[1m",
@@ -18,21 +24,38 @@ export enum LogStyle {
   Reverse = "\x1b[7m",
 }
 
+/**
+ * Enumeration for identifying the type of log entry.
+ */
 enum DataType {
   Newline = "newline",
   Timestamp = "timestamp",
   Message = "message",
 }
 
+/**
+ * Type definition for a log entry.
+ * @property {DataType} type - The type of log entry.
+ * @property {string | unknown[]} [data] - The content of the log entry, could be a message or other data types.
+ * @property {LogColor | LogStyle} [color] - Optional color or style for the log entry.
+ */
 type LogEntry = {
   type: DataType;
   data?: string | unknown[];
   color?: LogColor | LogStyle;
 };
 
+/**
+ * Class to create and manage a logger with support for colors, styles, and timestamps.
+ */
 export class Loglow {
   private data: LogEntry[] = [];
 
+  /**
+   * Adds a message log entry with optional styling.
+   * @param {...unknown[]} messages - One or more messages or data to log.
+   * @returns {this} The instance of Loglow for chaining.
+   */
   public add(...messages: unknown[]): this {
     this.data.push({
       type: DataType.Message,
@@ -41,6 +64,11 @@ export class Loglow {
     return this;
   }
 
+  /**
+   * Adds a timestamp log entry with an optional color or style.
+   * @param {LogColor | LogStyle} [color=LogStyle.Reset] - The color or style of the timestamp.
+   * @returns {this} The instance of Loglow for chaining.
+   */
   public addTimestamp(color: LogColor | LogStyle = LogStyle.Reset): this {
     this.data.push({
       type: DataType.Timestamp,
@@ -50,17 +78,30 @@ export class Loglow {
     return this;
   }
 
+  /**
+   * Adds a newline log entry.
+   * @returns {this} The instance of Loglow for chaining.
+   */
   public addNewline(): this {
     this.data.push({ type: DataType.Newline });
     return this;
   }
 
+  /**
+   * Checks if a given value is a valid LogColor or LogStyle.
+   * @private
+   * @param {string} value - The value to check.
+   * @returns {boolean} True if the value is a valid LogColor or LogStyle, false otherwise.
+   */
   private isLogColorOrStyle(value: string): boolean {
     return Object.values({ ...LogColor, ...LogStyle }).includes(
       value as LogColor | LogStyle,
     );
   }
 
+  /**
+   * Prints the log entries to the console with appropriate formatting.
+   */
   public print(): void {
     let output = "";
     this.data.forEach((item) => {
@@ -84,7 +125,6 @@ export class Loglow {
             if (typeof data === "string" && this.isLogColorOrStyle(data)) {
               accMessage += `${data}`;
             } else {
-              console.log("data", data);
               if (count > 0) {
                 accMessage += " ";
               }
