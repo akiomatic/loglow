@@ -1,4 +1,4 @@
-# Loglow
+# Loglow 🌟
 
 Loglow is a flexible logging utility for Node.js, designed to enhance your console output with customizable colors, styles, and timestamps. It's perfect for developers looking for more than just the standard logging capabilities.
 
